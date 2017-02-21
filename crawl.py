@@ -64,7 +64,7 @@ class Crawler():
             date_str = '{0}-{1:02d}-{2:02d}'.format(self.year, self.month, self.day)
             row = self._clean_row([
                 date_str,  # 日期
-                tds[2],  # 成交股數
+                tds[2][:-4],  # 成交股數
                 tds[4],  # 成交金額
                 tds[5],  # 開盤價
                 tds[6],  # 最高價
@@ -75,12 +75,6 @@ class Crawler():
             ])
 
             self._record(tds[0].strip(), row)
-
-    # def get_stocklist(self, tds):
-    #     fp = open('stocklist.csv', 'a')
-    #     fp.write('{}, {}\n'.format(tds[0].strip(), tds[1].strip()))
-    #     print('{}, {}'.format(tds[0].strip(), tds[1].strip()))
-    #     fp.close()
 
     def _get_otc_data(self, date_str):
         ttime = str(int(time.time()*100))
@@ -102,7 +96,7 @@ class Crawler():
                 date_str = '{0}-{1:02d}-{2:02d}'.format(self.year, self.month, self.day)
                 row = self._clean_row([
                     date_str,
-                    tr[8],  # 成交股數
+                    tr[8][:-4],  # 成交股數
                     tr[9],  # 成交金額
                     tr[4],  # 開盤價
                     tr[5],  # 最高價

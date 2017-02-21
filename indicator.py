@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pandas as pd
 import numpy as np
-from util import Cname
+from util import title
 
 
 def D_KD(df):
@@ -98,31 +98,27 @@ def get_kd(filename, num):
 
     df = pd.read_csv('data/' + filename + '.csv', index_col=0)
     df.index = pd.to_datetime(df.index)
-    if len(df.index) < num/2:
-        raise IndexError('Not enough data!')
-        # return False
 
     # print(df)
     df = df.apply(pd.to_numeric, errors='coerce')
 
     daily = D_KD(df)
-    weekly = W_KD(df)
-    monthly = M_KD(df)
+    week = W_KD(df)
+    month = M_KD(df)
 
     # num = 150
-    # result = pd.concat([df, daily, weekly, monthly], axis=1, join_axes=[df.index])[-num:]
+    # result = pd.concat([df, daily, week, month], axis=1, join_axes=[df.index])[-num:]
     # result.to_csv('pandas.txt', sep=',', mode='w')
-    return df, daily, weekly, monthly
+    return df, daily, week, month
 
 
 if __name__ == '__main__':
     sid = '1102'
-    cname = Cname()[sid]
+    cname = title()[sid]
 
     print(sid, cname)
     num = 365
     try:
         df, daily, weekly, monthly = get_kd(sid, num)
-        # drawing(num, df, daily, weekly, monthly, sid, cname)
     except IndexError as e:
         print('{}, {}, {}'.format(sid, cname, e))

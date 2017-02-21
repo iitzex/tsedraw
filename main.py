@@ -7,8 +7,9 @@ from util import get_list
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 import platform
+
 if platform.system() == 'Darwin':
-    font = fm.FontProperties(fname='/System/Library/Fonts/STHeiti Medium.ttc', size=20)
+    font = fm.FontProperties(fname='/System/Library/Fonts/STHeiti Medium.ttc', size=25)
 else:
     font = fm.FontProperties(fname='/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc')
 
@@ -28,6 +29,7 @@ def drawing(num, df, daily, weekly, monthly, df_f, df_revenue, df_gain, sid, tit
 
     begin = df.index[-1].to_pydatetime() - timedelta(num)
     begin = datetime(begin.year, begin.month, 1) - timedelta(1)
+    print(begin)
 
     df = df.loc[df.index >= begin]
     ax0.plot(df.index, df.close, 'b', alpha=0.7)
@@ -41,7 +43,7 @@ def drawing(num, df, daily, weekly, monthly, df_f, df_revenue, df_gain, sid, tit
     ax1.plot(daily.index, daily.k, 'r', daily.index, daily.d, 'c', alpha=0.3)
     ax1.plot(highK.index, highK.k, 'ro', mec='r')
     ax1.plot(lowK.index, lowK.k, 'go', mec='g')
-    ax1.set_title('daily KD', loc='right', fontproperties=font)
+    ax1.set_title('日KD', loc='right', fontproperties=font)
 
     weekly = weekly.loc[weekly.index >= begin]
     highK = weekly[weekly.wk >= 80]
@@ -49,7 +51,7 @@ def drawing(num, df, daily, weekly, monthly, df_f, df_revenue, df_gain, sid, tit
     ax2.plot(weekly.index, weekly.wk, 'r', weekly.index, weekly.wd, 'c', alpha=0.3)
     ax2.plot(highK.index, highK.wk, 'ro', mec='r')
     ax2.plot(lowK.index, lowK.wk, 'go', mec='g')
-    ax2.set_title('weekly KD', loc='right', fontproperties=font)
+    ax2.set_title('週KD', loc='right', fontproperties=font)
 
     monthly = monthly.loc[monthly.index >= begin]
     highK = monthly[monthly.mk >= 80]
@@ -57,27 +59,27 @@ def drawing(num, df, daily, weekly, monthly, df_f, df_revenue, df_gain, sid, tit
     ax3.plot(monthly.index, monthly.mk, 'r', monthly.index, monthly.md, 'c', alpha=0.3)
     ax3.plot(highK.index, highK.mk, 'ro', mec='r')
     ax3.plot(lowK.index, lowK.mk, 'go', mec='g')
-    ax3.set_title('monthly KD', loc='right', fontproperties=font)
+    ax3.set_title('月KD', loc='right', fontproperties=font)
 
-    bar_width = 0.1
-    ax4.bar(df.index, df.number/(df.number.mean()/30), bar_width, color='r', edgecolor='none')
-    ax4.set_title('Volume', loc='right', fontproperties=font)
+    ax4.bar(df.index, df.amount, 0.5, color='r', edgecolor='none')
+    ax4.get_yaxis().tick_right()
+    ax4.set_title('成交量', loc='right', fontproperties=font)
 
-    for ax in [ax1, ax2, ax3, ax4]:
+    for ax in [ax1, ax2, ax3]:
         ax.set_ylim(0, 100)
         ax.get_yaxis().set_visible(False)
         ax.get_xaxis().set_ticklabels([])
-        ax.set_axis_bgcolor('white')
+        ax.set_facecolor('white')
 
     ay0.plot(df_f.index, df_f.close, 'r', alpha=0.5, linewidth=2)
-    ay0.set_title('Revenue', loc='right', fontproperties=font)
+    ay0.set_title('月營收', loc='right', fontproperties=font)
     ay0.yaxis.grid(True)
     ax = ay0.twinx()
     ax.bar(df_revenue.index, df_revenue.revenue, width=10, color='#FFC107', edgecolor='#FFA000', alpha=0.5)
 
     ay1.plot(df_f.index, df_f.close, 'r', alpha=0.2, linewidth=2, zorder=1)
     ay1.get_yaxis().set_visible(False)
-    ay1.set_title('Gross/Profit Margin', loc='right', fontproperties=font)
+    ay1.set_title('毛利率/營益率', loc='right', fontproperties=font)
     ax = ay1.twinx()
     ax.plot(df_gain.index, df_gain.gross_margin, color='g', alpha=0.5, linewidth=2, zorder=2)
     ax.plot(df_gain.index, df_gain.profit_margin, color='b', alpha=0.5, linewidth=2, zorder=2)
@@ -91,15 +93,13 @@ def drawing(num, df, daily, weekly, monthly, df_f, df_revenue, df_gain, sid, tit
     fig.subplots_adjust(bottom=0.1, hspace=0.5)
     fig.set_facecolor('white')
     div = float(dividend(sid)) * 100 / df.close[-1]
-    fig.suptitle("{} {}, \t殖利率 {:"
-                 "6.2f}%".format(sid, title, div), fontsize=32, fontproperties=font)
+    fig.suptitle("{} {}, \t殖利率 {:6.2f}%".format(sid, title, div), fontsize=32, fontproperties=font)
 
     plt.savefig('pic/' + sid + '.png')
 
 
 def gen_pic(items):
     print('Generating Pic ...')
-    num = 365
     for sid, title in items:
         print('{}, {}'.format(sid, title))
 
@@ -108,6 +108,11 @@ def gen_pic(items):
             df_f.index = pd.to_datetime(df_f.index)
             df_f = df_f.iloc[-255 * 5:]
             df_f = df_f.apply(pd.to_numeric, errors='coerce')
+
+            if len(df_f.index) > 365:
+                num = 365
+            else:
+                num = len(df_f.index)
 
             df_revenue = profit(sid)
             df_gain = gain(sid)

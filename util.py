@@ -40,7 +40,7 @@ def convert_time():
                 tp.write(','.join(time))
 
 
-def Cname(name):
+def title(name):
     with open(name + '.csv', newline='') as csvfile:
         r = csv.reader(csvfile)
 
@@ -63,6 +63,6 @@ def get_list(name):
         yield sid, title
 
 if __name__ == '__main__':
-    c = Cname()
+    c = title()
     print(c['0050'])
 
