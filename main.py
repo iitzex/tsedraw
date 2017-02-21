@@ -29,11 +29,10 @@ def drawing(num, df, daily, weekly, monthly, df_f, df_revenue, df_gain, sid, tit
 
     begin = df.index[-1].to_pydatetime() - timedelta(num)
     begin = datetime(begin.year, begin.month, 1) - timedelta(1)
-    print(begin)
 
     df = df.loc[df.index >= begin]
     ax0.plot(df.index, df.close, 'b', alpha=0.7)
-    ax0.set_title('price', loc='right', fontproperties=font)
+    ax0.set_title('價格', loc='right', fontproperties=font)
     ax0.get_yaxis().tick_right()
     ax0.yaxis.grid(True)
 
